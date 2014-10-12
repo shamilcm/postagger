@@ -14,9 +14,7 @@ class POSTags{
 	static Hashtable<String, Integer> posToIndex = new Hashtable<String, Integer>();
 
 /* To initialize Hashtable of POSTags to corresponding indices.
- *
  */
-
 	public static void initialize(){
 		for(int i=0;i<45;i++){
 			posToIndex.put(posTagsList[i],i);
@@ -61,6 +59,16 @@ class Model implements Serializable{
 		}
 	}
 
+	public Integer getTagTrigramCounts(String tag, String prevTag, String prevPrevTag){
+		String keyString = prevPrevTag + "," + prevTag + "," + tag;
+		Integer count = tagTrigramCounts.get(keyString);
+		if (count == null) {
+			return 0;
+		}
+		return count;
+	}
+
+
 	public void incrementTagBigramCounts(String tag, String prevTag){
 		String keyString = prevTag + "," + tag;
 		Integer count = tagBigramCounts.get(keyString);
@@ -70,6 +78,15 @@ class Model implements Serializable{
 		else {
 			tagBigramCounts.put(keyString, count + 1);
 		}
+	}
+
+	public Integer getTagBigramCounts(String tag, String prevTag){
+		String keyString = prevTag + "," + tag;
+		Integer count = tagBigramCounts.get(keyString);
+		if (count == null) {
+			return 0;
+		}
+		return count;
 	}
 
 	public void incrementTagUnigramCounts(String tag){
@@ -83,6 +100,15 @@ class Model implements Serializable{
 		}
 	}
 
+	public Integer getTagUnigramCounts(String tag){
+		String keyString = tag;
+		Integer count = tagUnigramCounts.get(keyString);
+		if (count == null) {
+			return 0;
+		}
+		return count;
+	}
+
 	public void incrementWordCounts(String word){
 		String keyString = word;
 		Integer count = wordCounts.get(keyString);
@@ -92,6 +118,15 @@ class Model implements Serializable{
 		else {
 			wordCounts.put(keyString, count + 1);
 		}
+	}
+
+	public Integer getWordCounts(String word){
+		String keyString = word;
+		Integer count = wordCounts.get(keyString);
+		if (count == null) {
+			return 0;
+		}
+		return count;
 	}
 
 	public void incrementWordTagCounts(String word, String tag){
@@ -105,13 +140,17 @@ class Model implements Serializable{
 		}
 	}
 
-	public void printtable(){
-		System.out.println(wordTagCounts);
-		System.out.println("");
-		System.out.println(wordCounts);
-		System.out.println("");
-		System.out.println(tagTrigramCounts);
+	public Integer getWordTagCounts(String word, String tag){
+		String keyString = word + "," + tag;
+		Integer count = wordTagCounts.get(keyString);
+		if (count == null) {
+			return 0;
+		}
+		return count;
+	}
 
+
+	public void printtable(){
 	}
 }
 
@@ -163,7 +202,26 @@ public class build_tagger{
 				String sentence = in.readLine();
 				processSentence(sentence);
 			}
-			model.printtable();
+
+			// Saving model to model_file
+			ObjectOutputStream outputStream = null;
+			try {
+				outputStream = new ObjectOutputStream(new FileOutputStream(modelFile));
+				outputStream.writeObject(model);
+			} catch (FileNotFoundException ex) {
+				ex.printStackTrace();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			} finally {
+				try {
+					if (outputStream != null) {
+						outputStream.flush();
+						outputStream.close();
+					}
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
 
 
 		} catch (FileNotFoundException e) {
