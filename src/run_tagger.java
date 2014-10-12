@@ -41,12 +41,27 @@ public class run_tagger{
         static Model model = new Model();
 
         public static String[] viterbiTagger(String sentence){
-            String[] tagSequence = {"ABC", "DEF", "EFG"};
+            String[] words = sentence.split(" ");
+            Integer numWords = words.length;
+            Integer numTags = POSTags.posTagsList.length;
+
+            String[] tagSequence = new String[numWords];
+            
+            for(int i = 0; i < numWords; i++){
+                tagSequence[i] = "ABC" + i;
+            }
             return tagSequence;
         }
 
         public static String applyTags(String sentence, String[] tagSequence){
-            return "Hello/XXX How/ABC Are/DEF";
+            String[] words = sentence.split(" ");
+            String taggedSentence = "";
+            Integer numWords = words.length;
+
+            for(int i = 0; i < numWords; i++){
+                taggedSentence = taggedSentence + " " + words[i] + "/" + tagSequence[i];
+            }
+            return taggedSentence;
         }
 
         public static void main(String [] args){
