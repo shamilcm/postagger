@@ -1,6 +1,7 @@
 import java.io.Serializable;
 import java.util.*;
 import java.io.*;
+import java.lang.*;
 
 class POSTags{
     static String[] posTagsList = {
@@ -25,7 +26,7 @@ class POSTags{
         return posToIndex.get(posTag);
     }
 
-    public static String getPOSTag(Integer index){
+    public static String getTag(Integer index){
             return posTagsList[index];
     }
 
@@ -38,7 +39,7 @@ public class run_tagger{
         static String modelFile = "";
         static String outputFile = "";
 
-        static Model model = new Model();
+        static Model model;
 
         public static String[] viterbiTagger(String sentence){
             String[] words = sentence.split(" ");
@@ -46,11 +47,92 @@ public class run_tagger{
             Integer numTags = POSTags.posTagsList.length;
 
             String[] tagSequence = new String[numWords];
+            Integer[] tagIndexSequence = new Integer[numWords];
 
             Double[][] viterbiMatrix = new Double[numTags][numWords];
-		    int[][] backpointer = new int[numTags][numWords];
+		    int[][] backPointers = new int[numTags][numWords];
 
 
+            System.out.println(numTags);
+            // Initialization Steps
+            for (int  tagIndex = 0; tagIndex < numTags; tagIndex++) {
+
+                viterbiMatrix[tagIndex][0] =    model.getTransitionProbabilityLog("<START>", POSTags.getTag(tagIndex))
+                                                            + model.getObservationProbabilityLog(words[0], POSTags.getTag(tagIndex));
+                backPointers[tagIndex][0] = -1;
+            }
+
+            // Filling hte matrix
+            for(int wordIndex = 1; wordIndex < numWords; wordIndex++){
+                for(int tagIndex = 0; tagIndex < numTags; tagIndex++){
+
+                    //Find minimum in the previous column (set of tags). Minimum log probability = maximum probability
+                    Double value = Double.NEGATIVE_INFINITY;
+                    Integer backPointer = 0;
+
+                    for(int prevTagIndex = 0; prevTagIndex < numTags; prevTagIndex++){
+                        Double transProbability = viterbiMatrix[prevTagIndex][wordIndex-1]
+                                                    + model.getTransitionProbabilityLog(POSTags.getTag(prevTagIndex), POSTags.getTag(tagIndex));
+                        if(transProbability > value){
+                            value = transProbability ;
+                            backPointer = prevTagIndex;
+                        }
+                    }
+                    viterbiMatrix[tagIndex][wordIndex] = value +  model.getObservationProbabilityLog(words[wordIndex], POSTags.getTag(tagIndex));
+                    backPointers[tagIndex][wordIndex] = backPointer;
+
+                }
+            }
+
+            // Termination Step
+            Double value = Double.NEGATIVE_INFINITY;
+            Integer backPointer = 0;
+
+            for(int prevTagIndex = 0; prevTagIndex < numTags; prevTagIndex++){
+                Double transProbability = viterbiMatrix[prevTagIndex][numWords-1]
+                                            + model.getTransitionProbabilityLog(POSTags.getTag(prevTagIndex), "<END>");
+                if(transProbability > value){
+                    value = transProbability ;
+                    backPointer = prevTagIndex;
+                }
+            }
+
+            System.out.print("\t\t\t");
+            for(int j=0; j < numWords; j++){
+                System.out.print(" " + words[j] + "\t" );
+            }
+            System.out.println("");
+            for(int i=0; i<numTags; i++){
+                System.out.print(POSTags.getTag(i) + "\t\t\t");
+                for(int j=0; j < numWords; j++){
+                    System.out.printf("%.2f", viterbiMatrix[i][j]);
+                    System.out.print( "\t" );
+                }
+                System.out.println("");
+            }
+
+
+            for(int i=0; i<numTags; i++){
+                System.out.print(POSTags.getTag(i) + "\t\t\t");
+                for(int j=1; j < numWords; j++){
+                    System.out.print(POSTags.getTag(backPointers[i][j]) + "\t" );
+                }
+                System.out.println("");
+            }
+
+
+
+            // Trace Back for tag index sequence
+            tagIndexSequence[numWords-1] = backPointer;
+            for(int i = numWords-2; i>=0; i--){
+                tagIndexSequence[i] = backPointers[backPointer][i+1];
+                backPointer = tagIndexSequence[i];
+            }
+
+            //Convert Tag Index Sequence to Tag String Sequence
+            for(int i = 0; i < numWords; i++){
+                tagSequence[i] = POSTags.getTag(tagIndexSequence[i]);
+            }
 
             return tagSequence;
         }
@@ -84,12 +166,11 @@ public class run_tagger{
     			inputStream = new ObjectInputStream(new FileInputStream(modelFile));
     			Object obj = null;
     			obj = inputStream.readObject();
-    			Model model = null;
     			if (obj instanceof Model) {
     				model = (Model) obj;
     			}
-                //model.printModel();
-                System.out.println(model.getObservationProbability("White","NNP"));
+                System.out.println(model.getTransitionProbabilityLog("<START>","CC"));
+                model.printModel();
 
                 BufferedReader in = new BufferedReader(new FileReader(testFile));
                 PrintWriter writer = new PrintWriter(new FileOutputStream(outputFile));

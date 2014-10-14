@@ -9,19 +9,23 @@ class Model implements Serializable{
 
     private Hashtable<String, Integer> wordCounts = new Hashtable<String, Integer>();
     private Hashtable<String, Integer> wordTagCounts;
+    private Hashtable<String, Integer> wordTagTypes;  //For a given tag, number of word types with that tag
+    private Hashtable<String, Integer> tagBigramTypes;
 
     //Counts
     private Integer numTagUnigrams = 0;     // Sum(i) C(t_i)
 
 
     //Tag smoothing parameters
-    private Double[] lambda = {0.4, 0.3, 0.3};
+    private Double[] lambda = {0.8, 0.2};
 
     public Model(){
         tagUnigramCounts = new Hashtable<String, Integer>();
         tagBigramCounts = new Hashtable<String, Integer>();
         tagTrigramCounts = new Hashtable<String, Integer>();
         wordTagCounts = new Hashtable<String, Integer>();
+        wordTagTypes = new Hashtable<String, Integer>();
+        tagBigramTypes = new Hashtable<String, Integer>();
 
 
     }
@@ -52,6 +56,16 @@ class Model implements Serializable{
         Integer count = tagBigramCounts.get(keyString);
         if (count == null) {
             tagBigramCounts.put(keyString, 1);
+
+            // A new bigram is seen. Updating the seen bigram count for prevTag
+            Integer typesCount = tagBigramTypes.get(prevTag);
+            if (typesCount == null) {
+                tagBigramTypes.put(prevTag, 1);
+            }
+            else{
+                tagBigramTypes.put(prevTag, typesCount + 1);
+            }
+
         }
         else {
             tagBigramCounts.put(keyString, count + 1);
@@ -112,6 +126,14 @@ class Model implements Serializable{
         Integer count = wordTagCounts.get(keyString);
         if (count == null) {
             wordTagCounts.put(keyString, 1);
+
+            Integer typesCount = wordTagTypes.get(tag);
+            if (typesCount == null) {
+                wordTagTypes.put(tag, 1);
+            }
+            else{
+                wordTagTypes.put(tag, typesCount + 1);
+            }
         }
         else {
             wordTagCounts.put(keyString, count + 1);
@@ -121,6 +143,24 @@ class Model implements Serializable{
     public Integer getWordTagCounts(String word, String tag){
         String keyString = word + "," + tag;
         Integer count = wordTagCounts.get(keyString);
+        if (count == null) {
+            return 0;
+        }
+        return count;
+    }
+
+    public Integer getWordTagTypes(String tag){
+        String keyString = tag;
+        Integer count = wordTagTypes.get(tag);
+        if (count == null) {
+            return 0;
+        }
+        return count;
+    }
+
+    public Integer getTagBigramTypes(String tag){
+        String keyString = tag;
+        Integer count = tagBigramTypes.get(tag);
         if (count == null) {
             return 0;
         }
@@ -139,38 +179,65 @@ class Model implements Serializable{
 
 /* Transition probability: Interpolated probabilty of going from prevPrevTag to prevTag to tag
 */
-    public Double getTransitionProbability(String prevPrevTag, String prevTag, String tag){
+    public Double getTransitionProbabilityLog(String prevTag, String tag){
+        String prevPrevTag = "";
         Double trigramProbability = 0.0;
         Double bigramProbability = 0.0;
         Double unigramProbability = 0.0;
 
-        if(tag == "<END>"){
+        /*if(tag == "<END>"){
             if(getTagBigramCounts(prevTag, tag) > 0)
                 bigramProbability = getTagBigramCounts(prevTag, tag) * 1.0 / getTagUnigramCounts(prevTag);
-            return bigramProbability;
-        }
+            return Math.log(bigramProbability);
+        }*/
+
 
         // Trigram Conditional Probability: P(tag | prevPrevTag, prevTag)
         if(getTagTrigramCounts(prevPrevTag, prevTag, tag) > 0)
             trigramProbability = getTagTrigramCounts(prevPrevTag, prevTag, tag) * 1.0 / getTagBigramCounts(prevPrevTag, prevTag);
+
+
         // Bigram Conditional Probability: P(tag | prevTag)
         if(getTagBigramCounts(prevTag, tag) > 0)
             bigramProbability = getTagBigramCounts(prevTag, tag) * 1.0 / getTagUnigramCounts(prevTag);
+
         // Unigram Probability: P(tag)
         if(getTagUnigramCounts(tag) > 0)
-            unigramProbability = getTagUnigramCounts(tag) * 1.0 / numTagUnigrams;
+            unigramProbability = getTagUnigramCounts(tag) * 1.0 / getNumTagUnigrams();
 
-        Double transitionProbability = lambda[0]*trigramProbability + lambda[1]*bigramProbability + lambda[2]*unigramProbability;
+        //Witten-Bell smoothing parameters
+        Integer v = tagUnigramCounts.size();
+        Integer t = getTagBigramTypes(prevTag);
+        Integer z = v - t;
 
-        return transitionProbability;
+        if(getTagBigramCounts(prevTag, tag) > 0){
+            bigramProbability =  getTagBigramCounts(prevTag, tag) * 1.0 / (getTagUnigramCounts(prevTag) + t);
+        }
+        else{
+            bigramProbability = (z*1.0/t) / ( getTagUnigramCounts(prevTag) + t );
+        }
+
+
+        Double transitionProbability = bigramProbability;
+
+        return Math.log(transitionProbability);
     }
 
-    public Double getObservationProbability(String word, String tag){
+    public Double getObservationProbabilityLog(String word, String tag){
         Double observationProbability = 0.0;
+
+        //Witten-Bell smoothing parameters
+        Integer v = wordCounts.size();
+        Integer t = getWordTagTypes(tag);
+        Integer z = v - t;
+
         if(getWordTagCounts(word, tag) > 0){
-            observationProbability = getWordTagCounts(word, tag) * 1.0 / getTagUnigramCounts(tag);
+            observationProbability = getWordTagCounts(word, tag) * 1.0 / ( getTagUnigramCounts(tag) + t);
         }
-        return observationProbability;
+        else{
+            observationProbability = (z*1.0) / (t * ( getTagUnigramCounts(tag) + t ));
+        }
+        return Math.log(observationProbability);
     }
 
     public void printModel(){

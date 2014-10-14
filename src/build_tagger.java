@@ -12,8 +12,12 @@ public class build_tagger{
 
 	public static void processSentence(String sentence){
 		String[] wordTags = sentence.split(" ");
+
+		model.incrementTagUnigramCounts("<START>");
+		
 		String prevPrevTag = "<PRESTART>";
 		String prevTag = "<START>";
+
 		for(int i=0; i<wordTags.length;i++){
 			String wordTag[] =wordTags[i].split("/");
 			String word = "";
@@ -36,7 +40,7 @@ public class build_tagger{
 	}
 
 	public static void main(String [] args){
-		POSTags.initialize();					//To Intialize hashtable of POSTags to Index
+
 		// Check if the number of arguments are correct
 		if (args.length < 3) {
 			System.err.println("USAGE:\tjava build_tagger <sents.train> <sents.devt> <model_file>");
