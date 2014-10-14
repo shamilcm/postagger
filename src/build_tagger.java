@@ -32,7 +32,7 @@ public class build_tagger{
 			prevPrevTag = prevTag;
 			prevTag = tag;
 		}
-		model.incrementTagBigramCounts("<END>", prevTag);
+		model.incrementTagBigramCounts(prevTag, "<END>");
 	}
 
 	public static void main(String [] args){

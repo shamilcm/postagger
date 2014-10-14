@@ -144,6 +144,12 @@ class Model implements Serializable{
         Double bigramProbability = 0.0;
         Double unigramProbability = 0.0;
 
+        if(tag == "<END>"){
+            if(getTagBigramCounts(prevTag, tag) > 0)
+                bigramProbability = getTagBigramCounts(prevTag, tag) * 1.0 / getTagUnigramCounts(prevTag);
+            return bigramProbability;
+        }
+
         // Trigram Conditional Probability: P(tag | prevPrevTag, prevTag)
         if(getTagTrigramCounts(prevPrevTag, prevTag, tag) > 0)
             trigramProbability = getTagTrigramCounts(prevPrevTag, prevTag, tag) * 1.0 / getTagBigramCounts(prevPrevTag, prevTag);

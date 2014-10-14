@@ -47,12 +47,11 @@ public class run_tagger{
 
             String[] tagSequence = new String[numWords];
 
-            float[][] viterbiMatrix = new float[numTags][numWords];
+            Double[][] viterbiMatrix = new Double[numTags][numWords];
 		    int[][] backpointer = new int[numTags][numWords];
 
-            for(int i = 0; i < numWords; i++){
-                tagSequence[i] = "ABC" + i;
-            }
+
+
             return tagSequence;
         }
 
@@ -89,7 +88,7 @@ public class run_tagger{
     			if (obj instanceof Model) {
     				model = (Model) obj;
     			}
-                model.printModel();
+                //model.printModel();
                 System.out.println(model.getObservationProbability("White","NNP"));
 
                 BufferedReader in = new BufferedReader(new FileReader(testFile));
