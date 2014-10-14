@@ -23,8 +23,8 @@ public class build_tagger{
 			String tag = wordTag[wordTag.length - 1];
 
 		// Increment all counts in the model object
-			model.incrementTagTrigramCounts(tag, prevTag, prevPrevTag);
-			model.incrementTagBigramCounts(tag, prevTag);
+			model.incrementTagTrigramCounts(prevPrevTag, prevTag, tag);
+			model.incrementTagBigramCounts(prevTag, tag);
 			model.incrementTagUnigramCounts(tag);
 			model.incrementWordCounts(word);
 			model.incrementWordTagCounts(word, tag);
