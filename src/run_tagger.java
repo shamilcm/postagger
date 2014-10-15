@@ -53,7 +53,6 @@ public class run_tagger{
 		    int[][] backPointers = new int[numTags][numWords];
 
 
-            System.out.println(numTags);
             // Initialization Steps
             for (int  tagIndex = 0; tagIndex < numTags; tagIndex++) {
 
@@ -96,7 +95,7 @@ public class run_tagger{
                     backPointer = prevTagIndex;
                 }
             }
-
+/*
             System.out.print("\t\t\t");
             for(int j=0; j < numWords; j++){
                 System.out.print(" " + words[j] + "\t" );
@@ -120,7 +119,7 @@ public class run_tagger{
                 System.out.println("");
             }
 
-
+*/
 
             // Trace Back for tag index sequence
             tagIndexSequence[numWords-1] = backPointer;
@@ -169,8 +168,6 @@ public class run_tagger{
     			if (obj instanceof Model) {
     				model = (Model) obj;
     			}
-                System.out.println(model.getTransitionProbabilityLog("<START>","CC"));
-                model.printModel();
 
                 BufferedReader in = new BufferedReader(new FileReader(testFile));
                 PrintWriter writer = new PrintWriter(new FileOutputStream(outputFile));

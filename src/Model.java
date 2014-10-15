@@ -212,12 +212,23 @@ class Model implements Serializable{
 
         if(getTagBigramCounts(prevTag, tag) > 0){
             bigramProbability =  getTagBigramCounts(prevTag, tag) * 1.0 / (getTagUnigramCounts(prevTag) + t);
+
         }
         else{
-            bigramProbability = (z*1.0/t) / ( getTagUnigramCounts(prevTag) + t );
+            bigramProbability = (t*1.0) / (z * ( getTagUnigramCounts(prevTag) + t ));
         }
+/*
+        if(bigramProbability > 1.0){
+            System.out.println("PrevTag:" +  prevTag);
+            System.out.println("Tag:" +  tag);
+            System.out.println("getTagBigramCounts:" +  getTagBigramCounts(prevTag, tag));
+            System.out.println("getTagBigramCounts:" +  getTagUnigramCounts(prevTag)  );
+            System.out.println("z:" +  z);
+            System.out.println("v:" +  v);
+            System.out.println("t:" +  t);
 
-
+        }
+*/
         Double transitionProbability = bigramProbability;
 
         return Math.log(transitionProbability);
@@ -235,8 +246,20 @@ class Model implements Serializable{
             observationProbability = getWordTagCounts(word, tag) * 1.0 / ( getTagUnigramCounts(tag) + t);
         }
         else{
-            observationProbability = (z*1.0) / (t * ( getTagUnigramCounts(tag) + t ));
+            observationProbability = (t*1.0) / (z * ( getTagUnigramCounts(tag) + t ));
         }
+/*
+        if(observationProbability > 1.0){
+            System.out.println("Word:" +  word);
+            System.out.println("Tag:" +  tag);
+            System.out.println("getWordTagCounts:" +  getWordTagCounts(word, tag));
+            System.out.println("getTagUnigramCounts:" +  getTagUnigramCounts(tag)  );
+            System.out.println("z:" +  z);
+            System.out.println("v:" +  v);
+            System.out.println("t:" +  t);
+
+        }
+*/
         return Math.log(observationProbability);
     }
 
