@@ -17,7 +17,7 @@ class Model implements Serializable{
 
 
     //Tag smoothing parameters
-    private Double[] lambda = {0.8, 0.2};
+    private Double[] lambda = {1.0, 0.0};
 
     public Model(){
         tagUnigramCounts = new Hashtable<String, Integer>();
@@ -229,7 +229,8 @@ class Model implements Serializable{
 
         }
 */
-        Double transitionProbability = bigramProbability;
+        //By default, without tuning, lambda[0] = 1.0 and lambda[1] = 0.0
+         Double transitionProbability = lambda[0]*bigramProbability + lambda[1]*unigramProbability;
 
         return Math.log(transitionProbability);
     }
@@ -238,7 +239,7 @@ class Model implements Serializable{
         Double observationProbability = 0.0;
 
         //Witten-Bell smoothing parameters
-        Integer v = wordCounts.size();
+        Integer v = wordCounts.size() + 1; //+1 is for UNKNOWN words
         Integer t = getWordTagTypes(tag);
         Integer z = v - t;
 

@@ -142,7 +142,7 @@ public class run_tagger{
             Integer numWords = words.length;
 
             for(int i = 0; i < numWords; i++){
-                taggedSentence = taggedSentence + " " + words[i] + "/" + tagSequence[i];
+                taggedSentence = taggedSentence + words[i] + "/" + tagSequence[i] + " ";
             }
             return taggedSentence;
         }
@@ -151,7 +151,7 @@ public class run_tagger{
             POSTags.initialize();					//To Intialize hashtable of POSTags to Index
             // Check if the number of arguments are correct
             if (args.length < 3) {
-                System.err.println("USAGE:\tjava build_tagger <sents.test> <model_file> <sents.out>");
+                System.err.println("USAGE:\tjava run_tagger <sents.test> <model_file> <sents.out>");
                 System.exit(1);
             }
             // Store arguments in variables
