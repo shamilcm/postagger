@@ -13,7 +13,6 @@ else
 fi
 
 read lines filename <<< `wc -l $train_file`
-echo $lines
 n=10
 basedir=evaluation
 rm $basedir/*
@@ -27,12 +26,15 @@ for letter in {a..j} ; do
     cp $basedir/corrfile_a$letter $basedir/a$letter
 done
 
-for letter in {a..j} ; do
-    ./run_tagger
-    echo  "Illegal number of parameters. Usage: ./build_tagger.sh /path/to/training_data /path/to/dev_data /path/to/modelfile"
-    echo  "Illegal number of parameters. Usage: ./run_tagger.sh /path/to/testing_data /path/to/model_file /path/to/output_file"
-    echo  "Illegal number of parameters. Usage: ./evaluate_tagger.sh /path/to/taggedoutput_data /path/to/taggedcorrect_data /path/to/result_file"
-
-done
-
 rm $basedir/a*
+
+echo "Running cross-fold validation (n=10). "
+count=1
+for letter in {a..j} ; do
+    echo "Step $count"
+    count=$((count+1))
+    ./build_tagger.sh $basedir/trainfile_a$letter data/sents.devt $basedir/model_a$letter
+    ./run_tagger.sh $basedir/testfile_a$letter $basedir/model_a$letter $basedir/outfile_a$letter
+    ./evaluate_tagger.sh $basedir/outfile_a$letter $basedir/corrfile_a$letter $basedir/result_a$letter
+    echo "Done."
+done
