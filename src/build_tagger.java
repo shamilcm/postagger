@@ -15,7 +15,6 @@ public class build_tagger{
 
 		model.incrementTagUnigramCounts("<START>");
 
-		String prevPrevTag = "<PRESTART>";
 		String prevTag = "<START>";
 
 		for(int i=0; i<wordTags.length;i++){
@@ -29,13 +28,11 @@ public class build_tagger{
 			String tag = wordTag[wordTag.length - 1];
 
 		// Increment all counts in the model object
-			model.incrementTagTrigramCounts(prevPrevTag, prevTag, tag);
 			model.incrementTagBigramCounts(prevTag, tag);
 			model.incrementTagUnigramCounts(tag);
 			model.incrementWordCounts(word);
 			model.incrementWordTagCounts(word, tag);
 		// Updating the previous 2 tags
-			prevPrevTag = prevTag;
 			prevTag = tag;
 		}
 		model.incrementTagBigramCounts(prevTag, "<END>");

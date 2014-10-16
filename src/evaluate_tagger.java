@@ -27,6 +27,8 @@ class Result{
 
 }
 
+/* This class is to calculate the accuracy of the POS tagger based on a test data
+*/
 
 public class evaluate_tagger{
 
@@ -36,6 +38,7 @@ public class evaluate_tagger{
 
     static Result result = new Result();
 
+// Function to count the number of matches for each sentence
     public static void processSentence(String outSentence, String corrSentence){
         String[] outWordTags = outSentence.split(" ");
         String[] corrWordTags = corrSentence.split(" ");
@@ -77,9 +80,14 @@ public class evaluate_tagger{
                 String corrSentence = inCorrect.readLine();
                 processSentence(outSentence, corrSentence);
             }
-            System.out.println("Correctly Tagged words:" + result.getMatches());
-            System.out.println("Total words:" + result.getNumWords());
-            System.out.println("Accuracy: " + result.getAccuracy());
+            writer.println("Correctly Tagged words:\t" + result.getMatches());
+            writer.println("Total words:\t" + result.getNumWords());
+            writer.println("Accuracy:\t" + result.getAccuracy());
+
+            inOutput.close();
+            inCorrect.close();
+            writer.close();
+
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
