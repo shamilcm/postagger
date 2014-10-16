@@ -15,6 +15,7 @@ fi
 read lines filename <<< `wc -l $train_file`
 n=10
 basedir=evaluation
+mkdir -p $basedir
 rm $basedir/*
 newlines=`expr $lines + $n - 1`
 chunksize=`expr $newlines / $n`
