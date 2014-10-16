@@ -41,8 +41,12 @@ There are 5 shell scripts given with code for ease. Make sure you have set execu
 -------------------
 	Use ./crossvalidate.sh to do 10-fold cross validation. 10 result files result-a{a-j} files will be produced in 
 	evaluation/ directory containing the results of the 10 iterations.
+	It uses the following default parameters
+		1) data/sents.train		: tagged training data
+		2) data/sents.untagged	: untagged training data
+	Alternatively, you can specify your custom parameters in the following format,
+		./crossvalidate.sh /path/to/training_data /path/to/untagged_training_data
 
-
------
-Author: @shamilcm
+----------------------------------------------------------------------------------------------------------------
+Author: shamilcm
 Github: http://github.com/shamilcm
