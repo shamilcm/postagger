@@ -1,0 +1,44 @@
+Bigram HMM based Part-of-Speech Tagger
+======================================
+There are 5 shell scripts given with code for ease. Make sure you have set execute permissions for running these shell scripts.	
+	NOTE: These shell scripts will only work when you are executing them from the base directory of the code.
+	****
+
+1. Compiling the code.
+----------------------
+	Use ./compile.sh to compile the code in src/ directory
+	The compiled classes will be in build/ directory
+	
+2. Training
+-----------
+	Use ./build_tagger.sh to train the POS Tagger. It will use the following default parameters.
+		1) data/sents.train : training data for the POS Tagger
+		2) data/sents.devt  : development data for the POS Tagger
+		3) model/model_file : the output of the training is a model file. It is stored in this path.
+
+	Alternatively, you can specify your custom parameters parameters in the following format
+		./build_tagger.sh /path/to/training_data /path/to/dev_data /path/to/modelfile
+	
+3. Tagging
+----------
+	Use ./run_tagger.sh to run the POS Tagger. It will use the following default parameters
+		1) data/sents.test  : the untagged data that is to be tagged 
+		2) model/model_file : the model file produced as the output of training
+		3) output/sents.out : the output tagged data
+
+	Alternatively, you can specify your custom parameters in the following format
+		./run_tagger.sh /path/to/testing_data /path/to/model_file /path/to/output_tagged_file
+	
+4. Evaluation
+-------------
+	Use ./evaluate_tagger.sh to evaluate the POS Tagger output. It will use the following default parameters
+		1) output/sents.out		: the output tagged data produced by tagger to be evaluated 
+		2) data/sents.out		: correctly tagged data to be compared against
+		3) output/result_file	: the accuracy is output result is written to this file
+	Alternatively, you can specify your custom parameters in the following format
+		./evaluate_tagger.sh /path/to/output_tagged_file /path/to/correctly_tagged_file /path/to/result_file
+
+5. Cross Validation
+-------------------
+	Use ./crossvalidate.sh to do 10-fold cross validation. 10 result files result-a{a-j} files will be produced in 
+	evaluation/ directory containing the results of the 10 iterations.
