@@ -20,19 +20,17 @@ public class build_tagger{
 		for(int i=0; i<wordTags.length;i++){
 			String wordTag[] =wordTags[i].split("/");
 			String word = "";
+			//Combining all parts to a single part till the tag.
 			for (int j = 0; j < wordTag.length-1; j++) {
 			   word = word + wordTag[j];
 			}
-			//if(i<wordTags.length-1) System.out.print(word + " ");
-			//else System.out.println(word);
 			String tag = wordTag[wordTag.length - 1];
-
-		// Increment all counts in the model object
+			// Increment all counts in the model object
 			model.incrementTagBigramCounts(prevTag, tag);
 			model.incrementTagUnigramCounts(tag);
 			model.incrementWordCounts(word);
 			model.incrementWordTagCounts(word, tag);
-		// Updating the previous 2 tags
+			// Updating the previous tag
 			prevTag = tag;
 		}
 		model.incrementTagBigramCounts(prevTag, "<END>");

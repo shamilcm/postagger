@@ -38,25 +38,28 @@ public class evaluate_tagger{
 
     static Result result = new Result();
 
-// Function to count the number of matches for each sentence
+    // Function to count the number of correctly tagged words for each sentence
     public static void processSentence(String outSentence, String corrSentence){
         String[] outWordTags = outSentence.split(" ");
         String[] corrWordTags = corrSentence.split(" ");
+        // Check for sentence length mismatch
         if(outWordTags.length != corrWordTags.length){
                 System.out.println("Output file and correctly tagged file mismatch! Exiting... ");
                 System.exit(0);
         }
-
+        //Loop through the word-tag pairs
         for(int i=0; i<outWordTags.length;i++){
+            //Split the word and the tag for output and correct word-tag pairs
             String outWordTag[] = outWordTags[i].split("/");
             String corrWordTag[] = corrWordTags[i].split("/");
-
+            //Get the output tag and correct tag for each word
             String outTag = outWordTag[outWordTag.length - 1];
             String corrTag = corrWordTag[corrWordTag.length - 1];
-
+            // Increment the matches by 1 if the output tag is equal to the correct tag
             if(outTag.equals(corrTag)){
                 result.incrementMatches();
             }
+            // Increment the number of words enountered by 1
             result.incrementNumWords();
         }
     }
@@ -82,7 +85,7 @@ public class evaluate_tagger{
             }
             writer.println("Correctly Tagged words:\t" + result.getMatches());
             writer.println("Total words:\t" + result.getNumWords());
-            writer.println("Accuracy:\t" + result.getAccuracy());
+            writer.println("Accuracy:\t" + result.getAccuracy() + "%");
 
             inOutput.close();
             inCorrect.close();

@@ -65,7 +65,7 @@ public class run_tagger{
             for(int wordIndex = 1; wordIndex < numWords; wordIndex++){
                 for(int tagIndex = 0; tagIndex < numTags; tagIndex++){
 
-                    //Find minimum in the previous column (set of tags). Minimum log probability = maximum probability
+                    //Find maximum value from the previous column
                     Double value = Double.NEGATIVE_INFINITY;
                     Integer backPointer = 0;
 
@@ -94,8 +94,9 @@ public class run_tagger{
                     value = transProbability ;
                     backPointer = prevTagIndex;
                 }
+
             }
-/*
+/* PRINTS THE VITERBI MATRIX AND BACKPOINTER MATRIX
             System.out.print("\t\t\t");
             for(int j=0; j < numWords; j++){
                 System.out.print(" " + words[j] + "\t" );
