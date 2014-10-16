@@ -4,7 +4,7 @@ train_file=data/sents.train
 untagged_file=data/sents.untagged
 
 if [ "$#" -ne  2 ]; then
-    echo  "Illegal number of parameters. Usage: ./crossfold_evaluation.sh /path/to/training_data /path/to/untagged_data"
+    echo  "Illegal number of parameters. Usage: ./crossvalidate.sh /path/to/training_data /path/to/untagged_data"
     echo "Using default files to 10-fold cross evaluate..."
 
 else
